@@ -311,8 +311,10 @@ void elf_run(void *buf, char **argv, char **env)
    {
       for(x = 0; x < init_array->sh_size / sizeof(void *); x++)
       {
-         ptr = (int (*)(int, char **, char**))base + *((long *)(base + init_array->sh_addr + (x * sizeof(void *))));
-         ptr(argc, argv, env);
+        const size_t offset = *((long *)(base + init_array->sh_addr + (x * sizeof(void *))));
+        if (offset == 0) continue;
+        ptr = (int (*)(int, char **, char**))base + offset;
+        ptr(argc, argv, env);
       }
    }
 
